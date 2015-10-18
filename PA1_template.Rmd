@@ -20,6 +20,10 @@ output:
 ```
 
 ## What is mean total number of steps taken per day?
+
+### *For the first part of the analysis, we ignore the missing values and calculate the mean and median values for each day* 
+
+
 ```{r}
 #loading required library
         library(dplyr)
@@ -39,6 +43,7 @@ output:
 
 ### *Mean total number of steps is `r m` and median value is `r md`.*
 
+## Histogram of total steps 
 
 ```{r, echo=TRUE}
 #plotting the histogram
@@ -68,6 +73,9 @@ output:
 
 
 ## Imputing missing values
+
+### *We try to explore if substituting the missing values with the respective mean for that interval has any effect on mean and median values*
+
 
 ```{r, echo=TRUE}
 # finding count of missing values
@@ -101,8 +109,15 @@ output:
         md<-as.character(round(median(df_newSums$sum),digits=0))
 ```
 
-### *Mean total number of steps is `r m` and median value is `r md`.*
+### *Mean total number of steps is `r m` and median value is `r md`. No major effect on mean and median by imputing missing values*
 
+## Histogram of total steps 
+
+```{r, echo=TRUE}
+#plotting the histogram
+      with(df_newSums,
+           hist(sum))
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r, echo=TRUE}
@@ -124,9 +139,11 @@ output:
         df_new$day<-factor(df_new$day
                  ,levels=unique(df_new$day),
                             labels=as.character(unique(df_new$day)))
-        
-        
-        
+ 
+#setting up interval as factor
+        df_new$interval<-factor(df_new$interval,levels=unique(df_new$interval),
+                labels=as.character(unique(df_new$interval)))             
+ 
 #grouping by day and interval so that we can calcuate weekday and weekend means       
         intervals1=group_by(df_new,day,interval)
 
@@ -134,20 +151,24 @@ output:
         daywiseMeans<-summarise(intervals1,mean=mean(steps))
         
 
+        
 ```
+
 #plotting the patterns
-```{r, fig.width=12, fig.height=10}
+```{r,fig.width=14,fig.height= 12}
 #plotting the weekday and weekend patterns
-      par(mfrow=c(2,1),mar=c(4,2,1,1))
+      par(mfrow=c(2,1),mar=c(3,2,2,1))
         with(
                 subset(daywiseMeans,day=="weekday"),
-                plot(interval,mean,type="l",col="Red",main="weekday")
+                plot(interval,mean,main="weekday"),
+                lines(interval,mean,col="blue")
         )
         with(
                 subset(daywiseMeans,day=="weekend"),
-                plot(interval,mean,type="l",color="Blue",main="weekend")    
+                plot(interval,mean,main="weekend"),  
+                lines(interval,mean,col="red")
         )  
 ```
 
 
-## *As is evident from the graphs there is a decided difference between activity patterns during weekdays and weekends.*
+### *As is evident from the graphs there is a  difference between activity patterns during weekdays and weekends. While the peak for weekdays is higher than weekends, the distribution is more even for weekends.*
